@@ -3,7 +3,6 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<!-- Tiêu đề tab mặc định ban đầu -->
 <title>@ciara</title>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -27,6 +26,119 @@ body {
     overflow: hidden;
     user-select: none;
     -webkit-user-select: none;
+}
+
+/* =========================================
+   THREAD CURSOR - CHỈ HIỆN TRONG MAIN
+   ========================================= */
+#thread-canvas {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 100;
+    pointer-events: none;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity .7s ease, visibility .7s ease;
+}
+body.in-main #thread-canvas { opacity: 1; visibility: visible; }
+
+
+#network-canvas {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 101;
+    pointer-events: none;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity .8s ease, visibility .8s ease;
+}
+body.in-main #network-canvas { opacity: .8; visibility: visible; }
+
+/* CINEMATIC SPACE JUMP - STAR TUNNEL + PORTAL */
+#warp-transition {
+    position: fixed;
+    inset: 0;
+    z-index: 999;
+    pointer-events: none;
+    opacity: 0;
+    visibility: hidden;
+    overflow: hidden;
+    isolation: isolate;
+    background: radial-gradient(circle at center, #101a32 0%, #070d1d 30%, #020611 67%, #010208 100%);
+}
+#warp-transition.active { visibility: visible; animation: spaceScene 2.15s ease-in-out forwards; }
+#warp-stars {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 2;
+}
+.warp-portal {
+    position: absolute;
+    left: 50%; top: 50%;
+    width: min(42vw, 42vh);
+    aspect-ratio: 1;
+    border-radius: 50%;
+    z-index: 3;
+    opacity: 0;
+    transform: translate(-50%,-50%) scale(.08);
+    background: radial-gradient(circle, #ffffff 0%, #dcecff 1.5%, rgba(116,174,255,.5) 3%, rgba(31,72,160,.12) 8%, transparent 28%);
+    box-shadow: 0 0 18px rgba(190,220,255,.5), 0 0 55px rgba(67,119,255,.18);
+}
+.warp-portal::before,
+.warp-portal::after {
+    content: "";
+    position: absolute;
+    inset: 12%;
+    border: 1px solid rgba(220,237,255,.9);
+    border-radius: 50%;
+    box-shadow: 0 0 9px rgba(134,190,255,.48);
+}
+.warp-portal::after {
+    inset: 23%;
+    border-color: rgba(255,255,255,.72);
+    border-style: dashed;
+    filter: none;
+}
+#warp-transition.active .warp-portal { animation: portalOpen 2.15s cubic-bezier(.16,.72,.18,1) forwards; }
+.warp-flash {
+    position: absolute;
+    z-index: 4;
+    inset: 0;
+    opacity: 0;
+    background: radial-gradient(circle at center, rgba(255,255,255,.98) 0%, rgba(194,222,255,.8) 7%, rgba(105,157,255,.28) 23%, transparent 56%);
+}
+#warp-transition.active .warp-flash { animation: portalFlash 2.15s ease-out forwards; }
+@keyframes spaceScene {
+    0% { opacity: 0; }
+    9%,72% { opacity: 1; }
+    100% { opacity: 0; visibility: hidden; }
+}
+@keyframes portalOpen {
+    0% { opacity: 0; transform: translate(-50%,-50%) scale(.08) rotate(-18deg); }
+    18% { opacity: .9; }
+    54% { opacity: 1; transform: translate(-50%,-50%) scale(.8) rotate(12deg); }
+    78% { opacity: .95; transform: translate(-50%,-50%) scale(2.3) rotate(25deg); }
+    100% { opacity: 0; transform: translate(-50%,-50%) scale(5.5) rotate(35deg); }
+}
+@keyframes portalFlash {
+    0%,58% { opacity: 0; }
+    72% { opacity: .85; }
+    84% { opacity: .2; }
+    100% { opacity: 0; }
+}
+@media (max-width: 700px) {
+    .warp-portal { width: min(68vw, 42vh); }
+}
+@media (prefers-reduced-motion: reduce) {
+    #warp-transition.active { animation-duration: 1.2s; }
+    #warp-transition.active .warp-portal,
+    #warp-transition.active .warp-flash { animation-duration: 1.2s; }
 }
 
 /* INTRO */
@@ -128,12 +240,85 @@ body {
     opacity: 0;
     visibility: hidden;
     transition: opacity 1.2s ease;
-    background: #1a1a1a;
+    background: radial-gradient(ellipse at 50% 35%, #292b36 0%, #171821 48%, #08090f 100%);
 }
 
 .main.show { opacity: 1; visibility: visible; }
 
-/* BACKGROUND */
+
+/* COSMIC AURORA - CHI HIEN TRONG MAIN */
+.aurora-layer {
+    position: absolute;
+    inset: -18%;
+    z-index: 1;
+    pointer-events: none;
+    overflow: hidden;
+    opacity: 0;
+    transition: opacity 1.8s ease;
+    mix-blend-mode: screen;
+}
+body.in-main .aurora-layer { opacity: 1; }
+.aurora-layer::before,
+.aurora-layer::after {
+    content: "";
+    position: absolute;
+    width: 75vw;
+    height: 65vh;
+    min-width: 520px;
+    min-height: 420px;
+    border-radius: 50%;
+    filter: blur(72px);
+    transform: rotate(-22deg);
+    animation: auroraDrift 19s ease-in-out infinite alternate;
+}
+.aurora-layer::before {
+    left: -12%; top: 8%;
+    background: radial-gradient(ellipse, rgba(80,105,255,.19) 0%, rgba(115,75,220,.12) 38%, transparent 72%);
+}
+.aurora-layer::after {
+    right: -14%; bottom: -4%;
+    background: radial-gradient(ellipse, rgba(55,210,230,.13) 0%, rgba(112,85,255,.12) 42%, transparent 72%);
+    animation-duration: 25s;
+    animation-direction: alternate-reverse;
+}
+@keyframes auroraDrift {
+    0% { transform: translate3d(-3%, -2%, 0) rotate(-22deg) scale(.92); }
+    50% { transform: translate3d(5%, 4%, 0) rotate(-12deg) scale(1.08); }
+    100% { transform: translate3d(1%, -5%, 0) rotate(-28deg) scale(1); }
+}
+
+/* AVATAR ENERGY ORBIT */
+.avatar-wrapper::before,
+.avatar-wrapper::after {
+    content: "";
+    position: absolute;
+    inset: -8px;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 1;
+}
+.avatar-wrapper::before {
+    border: 1px solid rgba(154,190,255,.72);
+    border-left-color: transparent;
+    border-right-color: rgba(145,115,255,.8);
+    box-shadow: 0 0 9px rgba(108,145,255,.32), inset 0 0 8px rgba(100,145,255,.12);
+    animation: orbitSpin 8s linear infinite;
+}
+.avatar-wrapper::after {
+    inset: -13px;
+    border: 1px dashed rgba(190,205,255,.42);
+    border-top-color: rgba(95,220,255,.85);
+    border-bottom-color: transparent;
+    animation: orbitSpin 13s linear infinite reverse;
+}
+@keyframes orbitSpin { to { transform: rotate(360deg); } }
+.avatar-wrapper:hover::before { box-shadow: 0 0 16px rgba(108,145,255,.65); }
+@media (prefers-reduced-motion: reduce) {
+    .aurora-layer::before, .aurora-layer::after,
+    .avatar-wrapper::before, .avatar-wrapper::after { animation: none; }
+}
+
+/* BACKGROUND & TEXT RƠI */
 .bg-gif {
     position: absolute;
     inset: 0;
@@ -155,10 +340,93 @@ body {
     mix-blend-mode: multiply;
 }
 
-.glass-sheen {
+/* HIỆU ỨNG CHỮ RƠI MỜ */
+.falling-text-container {
     position: absolute;
     inset: 0;
     z-index: 2;
+    pointer-events: none;
+    overflow: hidden;
+}
+
+.falling-text {
+    position: absolute;
+    font-family: 'Nunito', sans-serif;
+    font-size: 24px;
+    font-weight: 800;
+    color: rgba(255, 255, 255, 0.15);
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+    white-space: nowrap;
+    filter: blur(1px);
+    animation: fall linear infinite;
+}
+
+@keyframes fall {
+    0% { transform: translateY(-100px) rotate(0deg); opacity: 0; }
+    10% { opacity: 1; }
+    90% { opacity: 1; }
+    100% { transform: translateY(100vh) rotate(20deg); opacity: 0; }
+}
+
+/* HIỆU ỨNG TRÁI TIM VẼ NÉT TAN CHẢY */
+.click-heart-svg {
+    position: fixed;
+    pointer-events: none;
+    z-index: 150;
+    width: 60px;
+    height: 60px;
+    transform: translate(-50%, -50%);
+    animation: heartDrawAndFade 1.2s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+
+.click-heart-svg path {
+    fill: transparent;
+    stroke: #ffb3c6;
+    stroke-width: 2.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    filter: drop-shadow(0 0 10px rgba(255, 179, 198, 0.9));
+    stroke-dasharray: 300;
+    stroke-dashoffset: 300;
+    animation: drawHeart 0.6s ease-out forwards;
+}
+
+@keyframes drawHeart {
+    0% { stroke-dashoffset: 300; fill: transparent; }
+    80% { stroke-dashoffset: 0; fill: transparent; }
+    100% { stroke-dashoffset: 0; fill: rgba(255, 179, 198, 0.3); }
+}
+
+@keyframes heartDrawAndFade {
+    0% { transform: translate(-50%, -50%) scale(0.5); opacity: 1; }
+    80% { transform: translate(-50%, -50%) scale(1.5); opacity: 1; }
+    100% { transform: translate(-50%, -50%) scale(2.5); opacity: 0; }
+}
+
+/* HIỆU ỨNG LẤP LÁNH (SPARKLES) */
+.sparkle {
+    position: absolute;
+    pointer-events: none;
+    width: 4px;
+    height: 4px;
+    background: #fff;
+    border-radius: 50%;
+    box-shadow: 0 0 6px #fff, 0 0 12px rgba(0, 255, 255, 0.8);
+    animation: floatSparkle 4s linear infinite;
+    opacity: 0;
+}
+
+@keyframes floatSparkle {
+    0% { transform: translateY(0) scale(0); opacity: 0; }
+    20% { opacity: 1; }
+    80% { opacity: 1; }
+    100% { transform: translateY(-100px) scale(1.5); opacity: 0; }
+}
+
+.glass-sheen {
+    position: absolute;
+    inset: 0;
+    z-index: 3;
     pointer-events: none;
     background:
         radial-gradient(ellipse 60% 40% at 22% 18%, rgba(255,255,255,.1), transparent 60%),
@@ -195,7 +463,7 @@ body {
 /* PROFILE */
 .profile-container {
     position: relative;
-    z-index: 8;
+    z-index: 20;
     display: flex;
     flex-direction: column;
     gap: 16px;
@@ -211,6 +479,7 @@ body {
     to { opacity: 1; transform: translateY(0); }
 }
 
+/* HIỆU ỨNG NGHIÊNG KHUNG */
 .tilt-card {
     transform-style: preserve-3d;
     will-change: transform;
@@ -513,7 +782,8 @@ body {
 
 .footer-right {
     display: flex;
-    gap: 25px;
+    gap: 15px;
+    align-items: center;
 }
 
 .footer-item {
@@ -525,12 +795,98 @@ body {
     font-weight: 600; 
     color: rgba(255, 255, 255, 0.6);
     text-shadow: 0 2px 5px rgba(0,0,0,0.5);
+    pointer-events: none; /* KHÔNG CHO CLICK VÀO MẮT XEM */
 }
 
 .footer-item svg {
     width: 16px;
     height: 16px;
     fill: rgba(255, 255, 255, 0.6);
+}
+
+/* =========================================
+   CSS CHO NÚT THẢ TIM DƯỚI PROFILE (CHỈ HIỂN THỊ)
+   ========================================= */
+.like-button-bottom {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    padding: 6px 12px;
+    border-radius: 20px;
+    color: #ffb3c6;
+    font-family: 'Nunito', sans-serif;
+    font-size: 14px;
+    font-weight: 800;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    pointer-events: none; /* KHÔNG CHO CLICK VÀO TIM DƯỚI PROFILE */
+}
+
+.like-button-bottom.liked {
+    color: #ff2a5f;
+    background: rgba(255, 42, 95, 0.15);
+    border-color: rgba(255, 42, 95, 0.4);
+}
+
+.like-button-bottom .heart-icon {
+    width: 16px;
+    height: 16px;
+    fill: currentColor;
+}
+
+/* =========================================
+   CSS CHO NÚT THẢ TIM TO KẾ BÊN LOA (BẤM ĐƯỢC)
+   ========================================= */
+.like-button-top {
+    position: fixed;
+    top: 20px;
+    left: 80px;
+    z-index: 20;
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(60, 60, 60, 0.6); 
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    color: #ffb3c6;
+    box-shadow: 0 4px 15px rgba(0,0,0,.3);
+}
+
+.like-button-top:hover {
+    background: rgba(255, 179, 198, 0.2);
+    border-color: rgba(255, 179, 198, 0.4);
+    transform: translateY(-2px);
+}
+
+.like-button-top.liked {
+    color: #ff2a5f;
+    background: rgba(255, 42, 95, 0.15);
+    border-color: rgba(255, 42, 95, 0.4);
+}
+
+.like-button-top .heart-icon {
+    width: 24px;
+    height: 24px;
+    fill: currentColor;
+    transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.pop-anim {
+    animation: popHeart 0.4s ease-out;
+}
+
+@keyframes popHeart {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.4); }
+    100% { transform: scale(1); }
 }
 
 /* SERVER CARD */
@@ -618,7 +974,7 @@ body {
 }
 
 /* =========================================
-   CỤM ĐIỀU KHIỂN ÂM THANH (THU GỌN / MỞ RỘNG)
+   CỤM ĐIỀU KHIỂN ÂM THANH
    ========================================= */
 .audio-controls-wrapper {
     position: fixed;
@@ -733,7 +1089,7 @@ body {
         justify-content: center; 
         gap: 15px; 
     }
-    .footer-right { gap: 15px; justify-content: center; }
+    .footer-right { gap: 15px; justify-content: center; flex-wrap: wrap; }
     
     .servers-grid { grid-template-columns: 1fr; }
     .server-card.full-width { grid-column: auto; }
@@ -742,11 +1098,81 @@ body {
         top: 10px;
         left: 10px;
     }
+    
+    .like-button-top {
+        top: 10px;
+        left: 70px;
+    }
 }
+
+
+/* FLOWER-FLAME CUSTOM CURSOR + FLOATING LOVE WORDS */
+#flower-cursor {
+    position: fixed;
+    left: 0; top: 0;
+    width: 38px; height: 38px;
+    z-index: 1005;
+    pointer-events: none;
+    opacity: 0;
+    visibility: hidden;
+    transform: translate(-50%, -50%);
+    transition: opacity .25s ease, visibility .25s ease;
+    filter: drop-shadow(0 0 7px rgba(255,157,90,.85));
+}
+body.in-main #flower-cursor { opacity: 1; visibility: visible; }
+body.in-main, body.in-main * { cursor: none !important; }
+#flower-cursor svg { width: 100%; height: 100%; overflow: visible; animation: flowerCursorSpin 5s linear infinite; }
+#flower-cursor .petal { fill: url(#flamePetal); stroke: rgba(255,245,210,.9); stroke-width: .8; }
+#flower-cursor .core { fill: #fff7cf; filter: drop-shadow(0 0 5px #ffb45e); }
+@keyframes flowerCursorSpin { to { transform: rotate(360deg); } }
+.floating-love-word {
+    position: fixed; z-index: 1004; pointer-events: none;
+    color: #fff2dc; font: 800 12px 'Nunito', sans-serif;
+    letter-spacing: .35px; white-space: nowrap;
+    text-shadow: 0 0 7px rgba(255,170,105,.95), 0 0 16px rgba(255,105,125,.65);
+    animation: loveWordFloat 1.45s ease-out forwards;
+}
+@keyframes loveWordFloat {
+    0% { opacity: 0; transform: translate(-50%, 0) scale(.7) rotate(-7deg); }
+    15% { opacity: 1; }
+    100% { opacity: 0; transform: translate(calc(-50% + var(--drift, 12px)), -68px) scale(1.12) rotate(8deg); }
+}
+@media (hover: none), (max-width: 700px) {
+    body.in-main, body.in-main * { cursor: auto !important; }
+    #flower-cursor { display: none; }
+}
+
 </style>
 </head>
 
 <body>
+
+<canvas id="thread-canvas" aria-hidden="true"></canvas>
+<canvas id="network-canvas" aria-hidden="true"></canvas>
+<div id="flower-cursor" aria-hidden="true">
+    <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+            <radialGradient id="flamePetal" cx="50%" cy="75%" r="75%">
+                <stop offset="0" stop-color="#fff9cf"/>
+                <stop offset=".42" stop-color="#ffcf83"/>
+                <stop offset="1" stop-color="#ff6e78"/>
+            </radialGradient>
+        </defs>
+        <g class="petal">
+            <path d="M50 46 C30 30 39 9 50 3 C61 15 69 31 50 46Z"/>
+            <path d="M54 50 C70 30 91 39 97 50 C85 61 69 69 54 50Z"/>
+            <path d="M50 54 C70 70 61 91 50 97 C39 85 31 69 50 54Z"/>
+            <path d="M46 50 C30 70 9 61 3 50 C15 39 31 31 46 50Z"/>
+            <path d="M51 47 C42 25 57 17 65 14 C68 29 65 42 51 47Z"/>
+            <path d="M53 51 C75 42 83 57 86 65 C71 68 58 65 53 51Z"/>
+            <path d="M49 53 C58 75 43 83 35 86 C32 71 35 58 49 53Z"/>
+            <path d="M47 49 C25 58 17 43 14 35 C29 32 42 35 47 49Z"/>
+        </g>
+        <circle class="core" cx="50" cy="50" r="8"/>
+    </svg>
+</div>
+
+<div id="warp-transition" aria-hidden="true"><canvas id="warp-stars"></canvas><div class="warp-portal"></div><div class="warp-flash"></div></div>
 
 <!-- FILE NHẠC NỀN -->
 <audio id="bg-music" src="music.mp3" loop></audio>
@@ -778,12 +1204,25 @@ body {
 </section>
 
 <section class="main" id="main">
-    <img class="bg-gif" src="background.gif" alt="Background">
+    
+    <img class="bg-gif" src="background.gif" alt="Background" onerror="this.style.display='none'">
     <div class="gray-overlay"></div>
+    <div class="aurora-layer" aria-hidden="true"></div>
+    
+    <!-- HIỆU ỨNG CHỮ RƠI MỜ -->
+    <div class="falling-text-container" id="fallingText"></div>
+
     <div class="glass-sheen"></div>
     <canvas id="particles"></canvas>
     <div class="grain"></div>
     <div class="vignette"></div>
+
+    <!-- NÚT THẢ TIM TO KẾ BÊN LOA -->
+    <div class="like-button-top" id="likeBtnTop">
+        <svg viewBox="0 0 24 24" class="heart-icon">
+            <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+        </svg>
+    </div>
 
     <!-- CỤM ĐIỀU KHIỂN ÂM THANH -->
     <div class="audio-controls-wrapper" id="audio-wrapper">
@@ -810,7 +1249,6 @@ body {
 
                 <div class="profile-info">
                     <div class="profile-name-row">
-                        <!-- TÊN CỐ ĐỊNH CÓ @ VÀ NHIỄU -->
                         <div class="title-container">
                             <span class="title-text">@ciara</span>
                         </div>
@@ -849,13 +1287,20 @@ body {
             </div>
 
             <div class="profile-footer">
-                <!-- THỜI GIAN THỰC Ở BÊN TRÁI -->
                 <div class="real-time-clock" id="realTimeClock">
                     <svg viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg>
                     <span id="timeString">Đang tải...</span>
                 </div>
 
                 <div class="footer-right">
+                    <!-- NÚT THẢ TIM DƯỚI PROFILE (CHỈ HIỂN THỊ) -->
+                    <div class="like-button-bottom" id="likeBtnBottom">
+                        <svg viewBox="0 0 24 24" class="heart-icon">
+                            <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                        </svg>
+                        <span id="likeCount">378</span>
+                    </div>
+
                     <div class="footer-item">
                         <svg viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
                         <span id="viewCount">28,388,382</span>
@@ -869,8 +1314,6 @@ body {
         </div>
 
         <div class="servers-grid">
-            
-            <!-- Server 3 (formerly Server 1) -->
             <a href="https://discord.gg/pZcCgYNzk" target="_blank" class="server-card tilt-card">
                 <img src="https://cdn.discordapp.com/embed/avatars/1.png" alt="SV3" class="list-avatar" id="server3-avatar">
                 <div class="list-info">
@@ -882,7 +1325,6 @@ body {
                 </div>
             </a>
 
-            <!-- Server 2 -->
             <a href="https://discord.gg/wQBeTyMyD3" target="_blank" class="server-card tilt-card">
                 <img src="https://cdn.discordapp.com/embed/avatars/2.png" alt="SV2" class="list-avatar" id="server2-avatar">
                 <div class="list-info">
@@ -894,7 +1336,6 @@ body {
                 </div>
             </a>
 
-            <!-- Server 1 (formerly Server 3) -->
             <a href="https://discord.gg/pd6G8m5ajz" target="_blank" class="server-card full-width tilt-card">
                 <img src="https://cdn.discordapp.com/embed/avatars/3.png" alt="SV1" class="list-avatar" id="server1-avatar">
                 <div class="list-info">
@@ -905,9 +1346,7 @@ body {
                     </div>
                 </div>
             </a>
-
         </div>
-
     </div>
 </section>
 
@@ -923,6 +1362,381 @@ const volumeIcon = document.getElementById('volume-icon');
 const audioWrapper = document.getElementById('audio-wrapper');
 
 let entered = false;
+
+/* =========================================
+   XỬ LÝ THẢ TIM & LƯỢT XEM (LƯU TRỮ GLOBAL BẰNG LOCALSTORAGE)
+   ========================================= */
+const likeBtnTop = document.getElementById('likeBtnTop');
+const likeBtnBottom = document.getElementById('likeBtnBottom');
+const likeCountEl = document.getElementById('likeCount');
+const viewCountEl = document.getElementById('viewCount');
+
+// --- KHỞI TẠO SỐ LIỆU TỪ LOCALSTORAGE ---
+// Số tim mặc định là 378
+let currentLikes = parseInt(localStorage.getItem('globalLikes')) || 378;
+// Số view mặc định là 28388382
+let currentViews = parseInt(localStorage.getItem('globalViews')) || 28388382;
+
+likeCountEl.textContent = currentLikes.toLocaleString('en-US');
+viewCountEl.textContent = currentViews.toLocaleString('en-US');
+
+// Kiểm tra trạng thái đã thả tim của thiết bị này chưa
+let isLiked = localStorage.getItem('hasLikedCiara') === 'true';
+
+// Hàm cập nhật giao diện 2 nút tim
+function updateLikeUI() {
+    if (isLiked) {
+        likeBtnTop.classList.add('liked');
+        likeBtnBottom.classList.add('liked');
+        // Nếu đã thả tim, hiển thị số tim hiện tại (đã bao gồm +1 của mình)
+        likeCountEl.textContent = currentLikes.toLocaleString('en-US');
+    } else {
+        likeBtnTop.classList.remove('liked');
+        likeBtnBottom.classList.remove('liked');
+        // Nếu chưa thả tim, hiển thị số tim hiện tại
+        likeCountEl.textContent = currentLikes.toLocaleString('en-US');
+    }
+}
+
+// Khởi tạo giao diện
+updateLikeUI();
+
+// Hàm xử lý khi bấm nút thả tim to
+function toggleLike(event) {
+    if (isLiked) {
+        // Nếu đang thả tim mà bấm lại -> Bỏ tim
+        isLiked = false;
+        currentLikes--; // Giảm số tim
+        localStorage.setItem('hasLikedCiara', 'false');
+    } else {
+        // Nếu chưa thả tim mà bấm -> Thả tim
+        isLiked = true;
+        currentLikes++; // Tăng số tim
+        localStorage.setItem('hasLikedCiara', 'true');
+    }
+
+    // Lưu số tim mới vào global
+    localStorage.setItem('globalLikes', currentLikes);
+
+    // Cập nhật giao diện
+    updateLikeUI();
+
+    // Hiệu ứng nảy tim
+    const activeBtn = event.currentTarget;
+    const heartIcon = activeBtn.querySelector('.heart-icon');
+    if (heartIcon) {
+        heartIcon.classList.remove('pop-anim');
+        void heartIcon.offsetWidth;
+        heartIcon.classList.add('pop-anim');
+    }
+}
+
+// Chỉ gắn sự kiện click cho nút TO ở trên
+likeBtnTop.addEventListener('click', toggleLike);
+
+// Giả lập user khác thả tim & xem (tự động tăng số lượng lưu vào global)
+setInterval(() => {
+    // Random 30% có người thả tim
+    if (Math.random() < 0.3) {
+        currentLikes++;
+        localStorage.setItem('globalLikes', currentLikes);
+        likeCountEl.textContent = currentLikes.toLocaleString('en-US');
+    }
+    
+    // Random 50% có người xem
+    if (Math.random() < 0.5) {
+        currentViews++;
+        localStorage.setItem('globalViews', currentViews);
+        viewCountEl.textContent = currentViews.toLocaleString('en-US');
+    }
+}, 3000);
+
+/* --- HIỆU ỨNG CLICK TRÁI TIM VẼ NÉT TAN CHẢY --- */
+document.addEventListener('click', function(e) {
+    if (e.target.closest('.audio-controls-wrapper') || e.target.closest('.like-button-top')) return;
+    
+    const heartSvg = document.createElement('div');
+    heartSvg.className = 'click-heart-svg';
+    heartSvg.innerHTML = `
+        <svg viewBox="0 0 100 100" width="100%" height="100%">
+            <path d="M50,85 C50,85 15,60 15,35 A 20,20 0 0 1 50,25 A 20,20 0 0 1 85,35 C85,60 50,85 50,85 Z" />
+        </svg>
+    `;
+    heartSvg.style.left = e.clientX + 'px';
+    heartSvg.style.top = e.clientY + 'px';
+    document.body.appendChild(heartSvg);
+    
+    setTimeout(() => {
+        heartSvg.remove();
+    }, 1200);
+});
+
+/* --- TẠO HIỆU ỨNG LẤP LÁNH --- */
+const sparkleContainer = document.querySelector('.main');
+setInterval(() => {
+    if (document.hidden) return;
+    const sparkle = document.createElement('div');
+    sparkle.className = 'sparkle';
+    sparkle.style.left = Math.random() * 100 + 'vw';
+    sparkle.style.top = Math.random() * 100 + 'vh';
+    sparkle.style.animationDuration = (Math.random() * 3 + 2) + 's';
+    sparkleContainer.appendChild(sparkle);
+    
+    setTimeout(() => {
+        sparkle.remove();
+    }, 5000);
+}, 300);
+
+
+/* STAR NETWORK - MANG SAO QUANH CON TRO */
+(() => {
+    const canvas = document.getElementById('network-canvas');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    let w = 0, h = 0, dpr = 1;
+    let mx = window.innerWidth / 2, my = window.innerHeight / 2;
+    let sx = mx, sy = my;
+    const count = window.innerWidth < 700 ? 17 : 27;
+    const nodes = Array.from({length: count}, (_, i) => ({
+        angle: Math.random() * Math.PI * 2,
+        radius: 24 + Math.random() * 105,
+        speed: (Math.random() * .003 + .0012) * (Math.random() < .5 ? -1 : 1),
+        size: .6 + Math.random() * 1.2,
+        phase: Math.random() * Math.PI * 2
+    }));
+    function resize() {
+        dpr = Math.min(window.devicePixelRatio || 1, 2);
+        w = window.innerWidth; h = window.innerHeight;
+        canvas.width = Math.round(w * dpr);
+        canvas.height = Math.round(h * dpr);
+        canvas.style.width = w + 'px';
+        canvas.style.height = h + 'px';
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
+    window.addEventListener('resize', resize, {passive:true});
+    window.addEventListener('pointermove', e => { mx = e.clientX; my = e.clientY; }, {passive:true});
+    resize();
+    function frame() {
+        requestAnimationFrame(frame);
+        ctx.clearRect(0, 0, w, h);
+        if (!document.body.classList.contains('in-main')) return;
+        sx += (mx - sx) * .16;
+        sy += (my - sy) * .16;
+        const t = performance.now();
+        const pts = nodes.map(n => {
+            n.angle += n.speed * 16;
+            const pulse = Math.sin(t * .0015 + n.phase) * 5;
+            return {x: sx + Math.cos(n.angle) * (n.radius + pulse), y: sy + Math.sin(n.angle) * (n.radius + pulse), size:n.size};
+        });
+        for (let i = 0; i < pts.length; i++) {
+            for (let j = i + 1; j < pts.length; j++) {
+                const dx = pts[i].x - pts[j].x, dy = pts[i].y - pts[j].y;
+                const dist = Math.hypot(dx, dy);
+                if (dist < 58) {
+                    ctx.strokeStyle = `rgba(174,205,255,${(1 - dist / 58) * .22})`;
+                    ctx.lineWidth = .55;
+                    ctx.beginPath(); ctx.moveTo(pts[i].x, pts[i].y); ctx.lineTo(pts[j].x, pts[j].y); ctx.stroke();
+                }
+            }
+        }
+        for (const p of pts) {
+            ctx.beginPath(); ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+            ctx.fillStyle = 'rgba(235,245,255,.9)';
+            ctx.shadowBlur = 7; ctx.shadowColor = 'rgba(125,175,255,.8)'; ctx.fill();
+        }
+        ctx.shadowBlur = 0;
+    }
+    frame();
+})();
+
+/* --- MULTI THREAD CURSOR: SPIRAL VORTEX TRAIL --- */
+const threadCanvas = document.getElementById('thread-canvas');
+const threadCtx = threadCanvas.getContext('2d');
+
+let threadW = 0;
+let threadH = 0;
+
+let pointerX = window.innerWidth / 2;
+let pointerY = window.innerHeight / 2;
+let smoothX = pointerX;
+let smoothY = pointerY;
+
+const threadCount = 7;
+const threadOffsets = Array.from(
+    { length: threadCount },
+    (_, i) => (i - (threadCount - 1) / 2) * 6
+);
+
+const trailLength = 80;
+const threadTrails = Array.from(
+    { length: threadCount },
+    () => Array.from(
+        { length: trailLength },
+        () => ({ x: pointerX, y: pointerY })
+    )
+);
+
+const SWIRL_SPEED = 0.04;
+const FOLLOW_FORCE = 0.08;
+
+function resizeThreads() {
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+
+    threadW = window.innerWidth;
+    threadH = window.innerHeight;
+
+    threadCanvas.width = Math.round(threadW * dpr);
+    threadCanvas.height = Math.round(threadH * dpr);
+    threadCanvas.style.width = threadW + 'px';
+    threadCanvas.style.height = threadH + 'px';
+
+    threadCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+}
+
+window.addEventListener('resize', resizeThreads, { passive: true });
+resizeThreads();
+
+window.addEventListener('pointermove', e => {
+    pointerX = e.clientX;
+    pointerY = e.clientY;
+}, { passive: true });
+
+function drawSpiralSwirl() {
+    requestAnimationFrame(drawSpiralSwirl);
+
+    const active = document.body.classList.contains('in-main');
+
+    if (!active) {
+        threadCtx.clearRect(0, 0, threadW, threadH);
+        return;
+    }
+
+    smoothX += (pointerX - smoothX) * 0.4;
+    smoothY += (pointerY - smoothY) * 0.4;
+
+    threadCtx.globalCompositeOperation = 'destination-out';
+    threadCtx.fillStyle = 'rgba(0, 0, 0, 0.15)';
+    threadCtx.fillRect(0, 0, threadW, threadH);
+    threadCtx.globalCompositeOperation = 'source-over';
+
+    const time = performance.now() * 0.001;
+
+    threadTrails.forEach((trail, index) => {
+        const baseAngle = (index / threadCount) * Math.PI * 2;
+
+        const headTargetX =
+            smoothX + Math.cos(baseAngle + time * 2) * threadOffsets[index];
+        const headTargetY =
+            smoothY + Math.sin(baseAngle + time * 2) * threadOffsets[index];
+
+        trail[0].x += (headTargetX - trail[0].x) * 0.5;
+        trail[0].y += (headTargetY - trail[0].y) * 0.5;
+
+        for (let k = 1; k < trail.length; k++) {
+            const prev = trail[k - 1];
+            const point = trail[k];
+
+            const diffX = prev.x - point.x;
+            const diffY = prev.y - point.y;
+            const currentAngle = Math.atan2(diffY, diffX);
+
+            const swirlAngle =
+                currentAngle + SWIRL_SPEED * (1 + k * 0.02);
+
+            const targetDist = 2 + k * 0.15;
+
+            const newX = prev.x - Math.cos(swirlAngle) * targetDist;
+            const newY = prev.y - Math.sin(swirlAngle) * targetDist;
+
+            point.x += (newX - point.x) * FOLLOW_FORCE;
+            point.y += (newY - point.y) * FOLLOW_FORCE;
+
+            point.x += Math.sin(time * 3 + k * 0.5 + index) * 0.3;
+            point.y += Math.cos(time * 3 + k * 0.5 + index) * 0.3;
+        }
+
+        threadCtx.beginPath();
+        threadCtx.moveTo(trail[0].x, trail[0].y);
+
+        for (let k = 1; k < trail.length - 1; k++) {
+            const midX = (trail[k].x + trail[k + 1].x) / 2;
+            const midY = (trail[k].y + trail[k + 1].y) / 2;
+
+            threadCtx.quadraticCurveTo(
+                trail[k].x,
+                trail[k].y,
+                midX,
+                midY
+            );
+        }
+
+        const tail = trail[trail.length - 1];
+        const gradient = threadCtx.createLinearGradient(
+            trail[0].x,
+            trail[0].y,
+            tail.x,
+            tail.y
+        );
+
+        gradient.addColorStop(0, 'rgba(255, 255, 255, 0.9)');
+        gradient.addColorStop(0.3, 'rgba(220, 235, 255, 0.5)');
+        gradient.addColorStop(0.7, 'rgba(180, 200, 255, 0.15)');
+        gradient.addColorStop(1, 'rgba(150, 180, 255, 0)');
+
+        threadCtx.strokeStyle = gradient;
+        threadCtx.lineWidth = 0.8;
+        threadCtx.lineCap = 'round';
+        threadCtx.lineJoin = 'round';
+        threadCtx.shadowBlur = 0;
+        threadCtx.stroke();
+    });
+}
+
+drawSpiralSwirl();
+
+
+
+/* FLOWER-FLAME CURSOR + NHWY FLOATING WORDS */
+(() => {
+    const cursor = document.getElementById('flower-cursor');
+    if (!cursor) return;
+    const phrases = ['nhwy w cia', 'nhwy iu', 'nhwy baby', 'bbi nhwy', 'nhwy ♡'];
+    let lastSpawn = 0;
+    let lastX = window.innerWidth / 2;
+    let lastY = window.innerHeight / 2;
+
+    window.addEventListener('pointermove', (event) => {
+        lastX = event.clientX;
+        lastY = event.clientY;
+        cursor.style.left = lastX + 'px';
+        cursor.style.top = lastY + 'px';
+        if (!document.body.classList.contains('in-main')) return;
+        const now = performance.now();
+        if (now - lastSpawn < 260) return;
+        lastSpawn = now;
+        const word = document.createElement('span');
+        word.className = 'floating-love-word';
+        word.textContent = phrases[Math.floor(Math.random() * phrases.length)];
+        word.style.left = (lastX + (Math.random() * 34 - 17)) + 'px';
+        word.style.top = (lastY - 12 + (Math.random() * 20 - 10)) + 'px';
+        word.style.setProperty('--drift', (Math.random() * 46 - 23) + 'px');
+        word.style.fontSize = (11 + Math.random() * 3) + 'px';
+        document.body.appendChild(word);
+        window.setTimeout(() => word.remove(), 1550);
+    }, { passive: true });
+})();
+
+function startTextRain() {
+    if (!textInterval) {
+        for(let i=0; i<5; i++) setTimeout(createFallingText, i*500);
+        textInterval = setInterval(createFallingText, 800);
+    }
+}
+
+function stopTextRain() {
+    clearInterval(textInterval);
+    textInterval = null;
+}
 
 /* --- XỬ LÝ THỜI GIAN THỰC --- */
 function updateClock() {
@@ -941,7 +1755,7 @@ function updateClock() {
 updateClock();
 setInterval(updateClock, 1000);
 
-/* --- HIỆU ỨNG GÕ CHỮ CHO TAB TRÌNH DUYỆT (GIỮ @, CHỈ GÕ CIARA) --- */
+/* --- HIỆU ỨNG GÕ CHỮ CHO TAB TRÌNH DUYỆT --- */
 const titleWord = "ciara";
 const prefix = "@";
 let titleIndex = 0;
@@ -949,19 +1763,16 @@ let titleDeleting = false;
 
 function typeTitleLoop() {
     const currentText = titleWord.substring(0, titleIndex);
-    
-    // Cập nhật tiêu đề tab: luôn có @ phía trước
     document.title = prefix + currentText;
 
     let typeSpeed = titleDeleting ? 100 : 150;
 
     if (!titleDeleting && titleIndex === titleWord.length) {
-        typeSpeed = 2000; // Dừng 2s khi gõ xong
+        typeSpeed = 2000; 
         titleDeleting = true;
     } else if (titleDeleting && titleIndex === 0) {
         titleDeleting = false;
-        typeSpeed = 500; // Dừng 0.5s trước khi gõ lại
-        // Khi xóa hết, đảm bảo title vẫn là "@ciara" (hoặc "@") trong lúc chờ
+        typeSpeed = 500; 
         document.title = prefix + "ciara"; 
     }
 
@@ -974,7 +1785,6 @@ function typeTitleLoop() {
     setTimeout(typeTitleLoop, typeSpeed);
 }
 
-// Bắt đầu hiệu ứng cho tab ngay khi tải trang
 setTimeout(typeTitleLoop, 1000);
 
 /* --- DANH SÁCH CÁC CÂU TÌNH YÊU --- */
@@ -1048,7 +1858,7 @@ document.addEventListener('click', (e) => {
     }
 });
 
-/* --- HIỆU ỨNG GÕ CHỮ ĐA CÂU (DÒNG TRẠNG THÁI) --- */
+/* --- HIỆU ỨNG GÕ CHỮ ĐA CÂU --- */
 function typeLoop() {
     const currentPhrase = phrases[phraseIndex];
     const currentText = currentPhrase.substring(0, typeIndex);
@@ -1095,18 +1905,118 @@ setTimeout(() => {
     enterEl.classList.add('show');
 }, 3000);
 
+// STAR TUNNEL: sao lao từ tâm ra ngoài tạo cảm giác bay xuyên không gian.
+const warpCanvas = document.getElementById('warp-stars');
+const warpCtx = warpCanvas ? warpCanvas.getContext('2d') : null;
+let warpFrame = 0;
+let warpStars = [];
+let warpRunning = false;
+function resizeWarpCanvas() {
+    if (!warpCanvas || !warpCtx) return;
+    const dpr = Math.min(window.devicePixelRatio || 1, 1.7);
+    warpCanvas.width = Math.floor(window.innerWidth * dpr);
+    warpCanvas.height = Math.floor(window.innerHeight * dpr);
+    warpCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+}
+function seedWarpStars() {
+    const count = Math.min(230, Math.max(100, Math.floor(window.innerWidth * window.innerHeight / 6500)));
+    warpStars = Array.from({ length: count }, () => ({
+        angle: Math.random() * Math.PI * 2,
+        depth: Math.random() * 1,
+        speed: .006 + Math.random() * .014,
+        size: .45 + Math.random() * 1.35
+    }));
+}
+function stopWarpStars() {
+    warpRunning = false;
+    if (warpFrame) cancelAnimationFrame(warpFrame);
+    warpFrame = 0;
+    if (warpCtx) warpCtx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+}
+function drawWarpStars() {
+    if (!warpRunning || !warpCtx) return;
+    const w = window.innerWidth, h = window.innerHeight;
+    const cx = w / 2, cy = h / 2;
+    warpCtx.fillStyle = 'rgba(2, 5, 16, .72)';
+    warpCtx.fillRect(0, 0, w, h);
+    for (const star of warpStars) {
+        const old = star.depth;
+        star.depth += star.speed;
+        if (star.depth > 1) {
+            star.depth = .015;
+            star.angle = Math.random() * Math.PI * 2;
+            star.speed = .006 + Math.random() * .014;
+        }
+        const spread = Math.pow(star.depth, 1.75) * Math.max(w, h) * .82;
+        const x = cx + Math.cos(star.angle) * spread;
+        const y = cy + Math.sin(star.angle) * spread;
+        const prevSpread = Math.pow(Math.max(.005, old), 1.75) * Math.max(w, h) * .82;
+        const px = cx + Math.cos(star.angle) * prevSpread;
+        const py = cy + Math.sin(star.angle) * prevSpread;
+        const alpha = Math.min(.95, .18 + star.depth * .9);
+        warpCtx.strokeStyle = `rgba(218,235,255,${alpha})`;
+        warpCtx.lineWidth = star.size * (.45 + star.depth * 1.15);
+        warpCtx.beginPath();
+        warpCtx.moveTo(px, py);
+        warpCtx.lineTo(x, y);
+        warpCtx.stroke();
+        if (star.depth > .82) {
+            warpCtx.fillStyle = `rgba(255,255,255,${alpha})`;
+            warpCtx.beginPath();
+            warpCtx.arc(x, y, star.size * 1.1, 0, Math.PI * 2);
+            warpCtx.fill();
+        }
+    }
+    warpFrame = requestAnimationFrame(drawWarpStars);
+}
+function startWarpStars() {
+    if (!warpCtx) return;
+    stopWarpStars();
+    resizeWarpCanvas();
+    seedWarpStars();
+    warpCtx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+    warpRunning = true;
+    drawWarpStars();
+    window.setTimeout(stopWarpStars, 2150);
+}
+window.addEventListener('resize', () => { if (warpRunning) resizeWarpCanvas(); });
+
 function enterSite() {
     if (entered) return;
     entered = true;
+
+    const warp = document.getElementById('warp-transition');
+    warp.classList.add('active');
+    startWarpStars();
     intro.classList.add('hide');
 
-    playMusic();
-
-    setTimeout(() => {
+    // Đặt lịch mở Main trước để lỗi nhạc/hiệu ứng phụ không thể chặn màn hình.
+    window.setTimeout(() => {
         main.classList.add('show');
-        setTimeout(typeLoop, 500); 
-    }, 500);
+        document.body.classList.add('in-main');
+        if (typeof typeLoop === 'function') window.setTimeout(typeLoop, 500);
+    }, 1450);
+
+    window.setTimeout(() => warp.classList.remove('active'), 1950);
+
+    try { playMusic(); } catch (error) { console.warn('Không thể phát nhạc:', error); }
+    try { startTextRain(); } catch (error) { console.warn('Không thể chạy hiệu ứng chữ:', error); }
+
+    // Dự phòng: luôn bảo đảm Main được mở sau khi chuyển cảnh.
+    window.setTimeout(() => {
+        main.classList.add('show');
+        document.body.classList.add('in-main');
+        warp.classList.remove('active');
+    }, 2400);
 }
+
+document.addEventListener("visibilitychange", () => {
+    if (document.hidden) {
+        stopTextRain();
+    } else if (entered) {
+        startTextRain();
+    }
+});
 
 /* CARD TILT */
 const tiltCards = document.querySelectorAll('.tilt-card');
@@ -1155,15 +2065,6 @@ profileCard.addEventListener('mouseleave', () => {
     magnet.style.transition = 'transform .35s cubic-bezier(.175,.885,.32,1.275)';
     magnet.style.transform = 'translate(0px, 0px) scale(1)';
 });
-
-/* --- XỬ LÝ LƯỢT XEM TĂNG MỖI GIÂY --- */
-let currentViews = 28388382;
-const viewCountEl = document.getElementById('viewCount');
-
-setInterval(() => {
-    currentViews += 1;
-    viewCountEl.textContent = currentViews.toLocaleString('en-US');
-}, 1000);
 
 /* DISCORD SERVER DATA */
 const INVITE_CODE_1 = 'pd6G8m5ajz';
